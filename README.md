@@ -4,7 +4,7 @@ Sistem pendeteksi batu ginjal berbasis web menggunakan AI (Roboflow).
 
 ## Tech Stack
 - Frontend: Next.js
-- Backend: Node.js
+- Backend: Next.js
 - ORM: Prisma
 - Database: PostgreSQL (NeonDB)
 - AI Inference: Roboflow Hosted API
