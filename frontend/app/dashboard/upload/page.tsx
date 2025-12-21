@@ -1,95 +1,53 @@
 "use client";
 
 import { useState } from "react";
-import ProtectedRoute from "@/components/protected-route";
+import { readDicomMetadata } from "@/lib/dicom-reader";
+import { dicomToImage } from "@/lib/dicom-image";
 
-export default function UploadPage() {
-  const [file, setFile] = useState<File | null>(null);
+export default function UploadCTScanPage() {
+  const [metadata, setMetadata] = useState<any>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
+  const handleUpload = async (file: File) => {
+    // 1️⃣ baca metadata pasien
+    const meta = await readDicomMetadata(file);
+    setMetadata(meta);
 
-    setFile(selectedFile);
-    setPreview(URL.createObjectURL(selectedFile));
-  };
+    // 2️⃣ convert DICOM → image
+    const canvas = await dicomToImage(file);
+    const imageBase64 = canvas.toDataURL("image/png");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    setPreview(imageBase64);
 
-    if (!file) {
-      alert("Silakan upload gambar CT-Scan terlebih dahulu");
-      return;
-    }
-
-    setLoading(true);
-
-    /**
-     * NOTE:
-     * Backend & ML belum ada
-     * nanti di sini:
-     * - kirim file ke API
-     * - terima hasil prediksi
-     */
-    setTimeout(() => {
-      setLoading(false);
-      alert("Simulasi upload berhasil (backend belum aktif)");
-    }, 1500);
+    // 3️⃣ KIRIM ke Roboflow (nanti)
+    /*
+      fetch("ROBOFLOW_API", {
+        method: "POST",
+        body: imageBase64
+      })
+    */
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-        <div className="w-full max-w-xl bg-white rounded-xl shadow p-8">
-          <h1 className="text-2xl font-bold text-center mb-6">
-            Upload CT-Scan Ginjal
-          </h1>
+    <div className="max-w-xl mx-auto p-6 space-y-4">
+      <input
+        type="file"
+        accept=".dcm"
+        onChange={(e) => e.target.files && handleUpload(e.target.files[0])}
+      />
 
-          <form onSubmit={handleSubmit}>
-            {/* Upload */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                File CT-Scan
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                disabled={loading}
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-
-            {/* Preview */}
-            {preview && (
-              <div className="mb-4">
-                <p className="text-sm font-medium mb-2">Preview:</p>
-                <img
-                  src={preview}
-                  alt="Preview CT Scan"
-                  className="w-full max-h-64 object-contain border rounded"
-                />
-              </div>
-            )}
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-60"
-            >
-              {loading ? "Memproses..." : "Upload & Analisis"}
-            </button>
-          </form>
-
-          {/* Info */}
-          <p className="text-xs text-gray-500 text-center mt-4">
-            * Saat ini hanya simulasi UI. Backend & model ML akan ditambahkan.
-          </p>
+      {metadata && (
+        <div className="bg-gray-100 p-4 rounded text-sm">
+          <p><b>Nama Pasien:</b> {metadata.patientName}</p>
+          <p><b>ID Pasien:</b> {metadata.patientId}</p>
+          <p><b>Jenis Kelamin:</b> {metadata.patientSex}</p>
+          <p><b>Umur:</b> {metadata.patientAge}</p>
         </div>
-      </div>
-    </ProtectedRoute>
+      )}
+
+      {preview && (
+        <img src={preview} alt="CT Scan Preview" className="rounded" />
+      )}
+    </div>
   );
 }

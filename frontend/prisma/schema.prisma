@@ -11,3 +11,14 @@ model Doctor {
   token     String
   createdAt DateTime @default(now())
 }
+
+model ScanResult {
+  id           String   @id @default(uuid())
+  doctorId     String
+  patientName  String
+  fileName     String
+  imageUrl     String     // CT scan asli / hasil anotasi
+  result       String     // "Batu Ginjal" | "Normal"
+  status       String     // "Selesai"
+  createdAt    DateTime   @default(now())
+}

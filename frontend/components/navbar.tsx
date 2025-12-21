@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function DashboardNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+
+  const [doctorId, setDoctorId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedDoctorId = localStorage.getItem("doctorId");
+    setDoctorId(storedDoctorId);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -21,12 +30,35 @@ export default function DashboardNavbar() {
 
   return (
     <header className="bg-white shadow">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <h1 className="font-bold text-lg text-blue-600">
-          MediKidney
-        </h1>
+      <div className="max-w-7xl mx-auto px-6 h-16 grid grid-cols-3 items-center">
+        
+        {/* ================= LOGO ================= */}
+        <div className="flex items-center gap-2">
+          <Image
+            src="/medikidney2.png"
+            alt="MediKidney Logo"
+            width={40}
+            height={40}
+            priority
+          />
+          <span className="font-bold text-lg text-blue-600">
+            MediKidney
+          </span>
+        </div>
 
-        <nav className="flex items-center gap-6">
+        {/* ================= SAPAAN ================= */}
+        <div className="text-center">
+          <span className="text-sm text-gray-600">
+            Halo,{" "}
+            <span className="font-semibold text-blue-600">
+              Dokter {doctorId ?? "—"}
+            </span>{" "}
+            👋
+          </span>
+        </div>
+
+        {/* ================= MENU ================= */}
+        <nav className="flex items-center justify-end gap-6">
           {menu.map((item) => (
             <Link
               key={item.href}
