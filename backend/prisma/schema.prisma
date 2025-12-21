@@ -1,0 +1,14 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Doctor {
+  id        String   @id @default(uuid())
+  doctorId  String   @unique
+  token     String
+  createdAt DateTime @default(now())
+}

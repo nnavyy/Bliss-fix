@@ -23,6 +23,7 @@ export async function loginDoctor(payload: LoginPayload): Promise<LoginResponse>
       localStorage.setItem("doctorId", res.data.data.doctorId);
     }
 
+
     return res.data;
   } catch (error: any) {
     return {
