@@ -31,9 +31,13 @@ export default function DashboardNavbar() {
   return (
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-6 h-16 grid grid-cols-3 items-center">
-        
-        {/* ================= LOGO ================= */}
-        <div className="flex items-center gap-2">
+
+        {/* ================= LOGO (CLICKABLE → HOME) ================= */}
+        {/* FIX: dibungkus link di klik MediKidney balik ke home */}
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2"
+        >
           <Image
             src="/medikidney2.png"
             alt="MediKidney Logo"
@@ -44,7 +48,7 @@ export default function DashboardNavbar() {
           <span className="font-bold text-lg text-blue-600">
             MediKidney
           </span>
-        </div>
+        </Link>
 
         {/* ================= SAPAAN ================= */}
         <div className="text-center">

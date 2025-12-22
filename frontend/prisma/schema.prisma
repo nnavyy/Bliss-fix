@@ -10,15 +10,19 @@ model Doctor {
   doctorId  String   @id
   token     String
   createdAt DateTime @default(now())
+
+  scans Scan[]
 }
 
-model ScanResult {
-  id           String   @id @default(uuid())
-  doctorId     String
-  patientName  String
-  fileName     String
-  imageUrl     String     // CT scan asli / hasil anotasi
-  result       String     // "Batu Ginjal" | "Normal"
-  status       String     // "Selesai"
-  createdAt    DateTime   @default(now())
+model Scan {
+  id          String   @id @default(uuid())
+  patientName String
+  image       String // base64 / image url
+  result      String // "Batu Ginjal" | "Normal"
+  confidence  Float
+  predictions Json // RAW predictions dari Roboflow
+  scannedAt   DateTime @default(now())
+
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [doctorId])
 }
