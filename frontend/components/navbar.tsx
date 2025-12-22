@@ -25,7 +25,7 @@ export default function DashboardNavbar() {
   const menu = [
     { label: "Upload Scan", href: "/dashboard/upload" },
     { label: "Riwayat", href: "/dashboard/history" },
-    { label: "Laporan", href: "/dashboard/report" },
+    
   ];
 
   return (

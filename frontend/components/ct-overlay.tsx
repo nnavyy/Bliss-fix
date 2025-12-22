@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
-type Point = { x: number; y: number };
+import { useEffect, useRef, useState } from "react";
 
 type Prediction = {
-  class: string;
-  confidence: number;
-  points: Point[];
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  confidence?: number;
+  class?: string;
+  points?: { x: number; y: number }[];
 };
 
 type CTOverlayProps = {
@@ -21,70 +23,140 @@ export default function CTOverlay({
   predictions,
   opacity = 0.4,
 }: CTOverlayProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [imgSize, setImgSize] = useState({ w: 0, h: 0 });
+
+  // ===============================
+  // GET NATURAL IMAGE SIZE
+  // ===============================
   useEffect(() => {
-    const canvas = canvasRef.current;
     const img = imgRef.current;
-    if (!canvas || !img) return;
+    if (!img) return;
+
+    const handleLoad = () => {
+      setImgSize({
+        w: img.naturalWidth,
+        h: img.naturalHeight,
+      });
+    };
+
+    if (img.complete && img.naturalWidth) {
+      handleLoad();
+    } else {
+      img.onload = handleLoad;
+    }
+  }, [imageSrc]);
+
+  // ===============================
+  // DRAW OVERLAY (SCALE + OFFSET)
+  // ===============================
+  useEffect(() => {
+    const container = containerRef.current;
+    const img = imgRef.current;
+    const canvas = canvasRef.current;
+
+    if (!container || !img || !canvas || !imgSize.w) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = img.width;
-    canvas.height = img.height;
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.width = cw;
+    canvas.height = ch;
 
-    predictions.forEach((pred) => {
-      let rgb = "34,197,94"; // normal
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.globalAlpha = opacity;
 
-      if (pred.class.toLowerCase().includes("stone")) {
-        rgb = "239,68,68"; // red
-      } else if (pred.class.toLowerCase().includes("abnormal")) {
-        rgb = "249,115,22"; // orange
+    // === STYLE ===
+    ctx.strokeStyle = "#ff0000";
+    ctx.fillStyle = "#ff0000";
+    ctx.lineWidth = 4; // 🔥 LEBIH TEBAL
+    ctx.font = "bold 13px Arial";
+    ctx.textBaseline = "top";
+
+    const scaleX = img.clientWidth / imgSize.w;
+    const scaleY = img.clientHeight / imgSize.h;
+
+    const offsetX = (cw - img.clientWidth) / 2;
+    const offsetY = (ch - img.clientHeight) / 2;
+
+    predictions.forEach((p) => {
+      // ===== SEGMENTATION (POINTS) =====
+      if (Array.isArray(p.points) && p.points.length > 2) {
+        ctx.beginPath();
+        p.points.forEach((pt, i) => {
+          const x = offsetX + pt.x * scaleX;
+          const y = offsetY + pt.y * scaleY;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.stroke();
+        return;
       }
 
-      const strokeColor = `rgb(${rgb})`;
-      const fillColor = `rgba(${rgb}, ${opacity})`;
+      // ===== BOUNDING BOX =====
+      if (
+        typeof p.x === "number" &&
+        typeof p.y === "number" &&
+        typeof p.width === "number" &&
+        typeof p.height === "number"
+      ) {
+        const x = offsetX + (p.x - p.width / 2) * scaleX;
+        const y = offsetY + (p.y - p.height / 2) * scaleY;
+        const w = p.width * scaleX;
+        const h = p.height * scaleY;
 
-      ctx.beginPath();
-      pred.points.forEach((p, i) => {
-        if (i === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
-      });
-      ctx.closePath();
+        // BOX
+        ctx.strokeRect(x, y, w, h);
 
-      ctx.strokeStyle = strokeColor;
-      ctx.lineWidth = 2;
-      ctx.stroke();
+        // ===== LABEL =====
+        const label = `${p.class ?? "object"} ${
+          p.confidence ? `${Math.round(p.confidence * 100)}%` : ""
+        }`.trim();
 
-      ctx.fillStyle = fillColor;
-      ctx.fill();
+        const padding = 4;
+        const textWidth = ctx.measureText(label).width;
+        const textHeight = 16;
 
-      const first = pred.points[0];
-      ctx.fillStyle = strokeColor;
-      ctx.font = "14px sans-serif";
-      ctx.fillText(
-        `${pred.class} (${Math.round(pred.confidence * 100)}%)`,
-        first.x,
-        first.y - 5
-      );
+        // background label
+        ctx.fillStyle = "rgba(255,0,0,0.85)";
+        ctx.fillRect(
+          x,
+          y - textHeight - padding,
+          textWidth + padding * 2,
+          textHeight
+        );
+
+        // text
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(label, x + padding, y - textHeight - padding + 2);
+
+        // reset color
+        ctx.fillStyle = "#ff0000";
+      }
     });
-  }, [predictions, opacity]);
+  }, [predictions, imgSize, opacity]);
 
   return (
-    <div className="relative inline-block">
+    <div
+      ref={containerRef}
+      className="relative w-full flex justify-center items-center"
+    >
       <img
         ref={imgRef}
         src={imageSrc}
         alt="CT Scan"
-        className="rounded-lg"
+        className="max-h-[60vh] w-auto object-contain block"
       />
       <canvas
         ref={canvasRef}
-        className="absolute top-0 left-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
       />
     </div>
   );

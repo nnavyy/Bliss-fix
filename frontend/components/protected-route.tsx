@@ -19,7 +19,7 @@ export default function ProtectedRoute({
     // ===============================
     // MODE DEV: AUTH DIMATIKAN
     // ===============================
-    if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") {
+      if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") {
       console.log("AUTH DISABLED (DEV MODE)");
       setChecking(false);
       return;

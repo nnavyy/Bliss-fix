@@ -5,20 +5,38 @@ import jsPDF from "jspdf";
 import { getHistory, ScanHistoryItem } from "@/services/history-service";
 import CTOverlay from "@/components/ct-overlay";
 
+// ===============================
+// GENERATE REPORT ID
+// ===============================
+function generateReportId() {
+  const date = new Date()
+    .toISOString()
+    .slice(0, 10)
+    .replace(/-/g, "");
+  const rand = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `RPT-${date}-${rand}`;
+}
+
 export default function HistoryPage() {
   const [history] = useState<ScanHistoryItem[]>(getHistory());
   const [selected, setSelected] = useState<ScanHistoryItem | null>(null);
 
-  // =========================================
-  // DOWNLOAD PDF (FIT IMAGE + BOX + LABEL)
-  // =========================================
+  // ===============================
+  // DOWNLOAD PDF HANDLER
+  // ===============================
   const handleDownloadPDF = (item: ScanHistoryItem) => {
+    const reportId = generateReportId(); // 🔥 REPORT ID
+
     const pdf = new jsPDF();
 
-    // ---------- HEADER ----------
+    // ===== HEADER =====
     pdf.setFontSize(16);
     pdf.text("Laporan Hasil CT Scan", 20, 20);
 
+    pdf.setFontSize(10);
+    pdf.text(`Report ID : ${reportId}`, 20, 28);
+
+    // ===== DATA =====
     pdf.setFontSize(12);
     pdf.text(`Nama Pasien : ${item.patientName}`, 20, 40);
     pdf.text(`Tanggal     : ${item.date}`, 20, 50);
@@ -29,58 +47,20 @@ export default function HistoryPage() {
       70
     );
 
-    // ---------- IMAGE ----------
-    if (!item.image.startsWith("data:image")) {
-      pdf.save(`CT-Scan-${item.patientName}.pdf`);
-      return;
+    // ===== IMAGE =====
+    if (item.image.startsWith("data:image")) {
+      pdf.addImage(item.image, "PNG", 20, 85, 170, 100);
     }
 
-    const img = new Image();
-    img.src = item.image;
+    // ===== FOOTER =====
+    pdf.setFontSize(9);
+    pdf.text(
+      "Catatan: Laporan ini dihasilkan secara otomatis oleh sistem.",
+      20,
+      195
+    );
 
-    img.onload = () => {
-      const maxWidth = 170;
-      const maxHeight = 110;
-
-      const imgRatio = img.width / img.height;
-      let renderWidth = maxWidth;
-      let renderHeight = maxWidth / imgRatio;
-
-      if (renderHeight > maxHeight) {
-        renderHeight = maxHeight;
-        renderWidth = maxHeight * imgRatio;
-      }
-
-      const imgX = 20;
-      const imgY = 85;
-
-      // draw image (FIT, NO STRETCH)
-      pdf.addImage(item.image, "PNG", imgX, imgY, renderWidth, renderHeight);
-
-      // ---------- BOUNDING BOX ----------
-      const scaleX = renderWidth / img.width;
-      const scaleY = renderHeight / img.height;
-
-      pdf.setDrawColor(255, 0, 0);
-      pdf.setTextColor(255, 0, 0);
-      pdf.setFontSize(9);
-
-      item.predictions.forEach((p) => {
-        const boxX = imgX + (p.x - p.width / 2) * scaleX;
-        const boxY = imgY + (p.y - p.height / 2) * scaleY;
-        const boxW = p.width * scaleX;
-        const boxH = p.height * scaleY;
-
-        // draw rectangle
-        pdf.rect(boxX, boxY, boxW, boxH);
-
-        // label + confidence
-        const label = `${p.class} (${Math.round(p.confidence * 100)}%)`;
-        pdf.text(label, boxX, boxY - 2);
-      });
-
-      pdf.save(`CT-Scan-${item.patientName}.pdf`);
-    };
+    pdf.save(`${reportId}.pdf`);
   };
 
   return (
@@ -99,7 +79,7 @@ export default function HistoryPage() {
               <img
                 src={item.image}
                 alt="CT Scan"
-                className="rounded-lg h-40 w-full object-cover mb-3"
+                className="rounded-lg h-36 w-full object-contain bg-gray-100 mb-3"
               />
 
               <p className="font-semibold">{item.patientName}</p>
@@ -122,7 +102,7 @@ export default function HistoryPage() {
       {/* ================= MODAL DETAIL ================= */}
       {selected && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl max-w-3xl w-full p-6 relative">
+          <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
             <button
               className="absolute top-3 right-3 text-gray-500"
               onClick={() => setSelected(null)}
@@ -133,15 +113,18 @@ export default function HistoryPage() {
             <h2 className="text-lg font-semibold mb-1">
               {selected.patientName}
             </h2>
-            <p className="text-sm text-gray-500 mb-3">
+            <p className="text-sm text-gray-500 mb-4">
               {selected.date}
             </p>
 
-            <CTOverlay
-              imageSrc={selected.image}
-              predictions={selected.predictions}
-              opacity={0.4}
-            />
+            {/* IMAGE VIEW */}
+            <div className="relative w-full max-h-[60vh] overflow-hidden rounded-lg border bg-black flex items-center justify-center">
+              <CTOverlay
+                imageSrc={selected.image}
+                predictions={selected.predictions}
+                opacity={0.4}
+              />
+            </div>
 
             <p
               className={`mt-4 font-semibold ${
