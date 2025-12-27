@@ -10,7 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^7.2.0",
+    "@prisma/client": "5.10.2",
     "@prisma/extension-accelerate": "^3.0.1",
     "axios": "^1.13.2",
     "cornerstone-core": "^2.6.1",
@@ -20,7 +20,7 @@
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^3.0.4",
     "next": "16.0.10",
-    "prisma": "^7.2.0",
+    "prisma": "5.10.2",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
