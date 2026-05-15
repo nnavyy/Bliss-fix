@@ -1,9 +1,9 @@
 import "../styles/globals.css";
-import { ReactNode } from "react";
 
 export const metadata = {
-  title: "Bliss Fix",
-  description: "Sistem Deteksi Batu Ginjal",
+  title: "MediKidney — Kidney Stone Detection",
+  description:
+    "AI-powered kidney stone detection system for medical professionals",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

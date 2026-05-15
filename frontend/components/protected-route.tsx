@@ -9,45 +9,30 @@ export default function ProtectedRoute({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-
   const [checking, setChecking] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);
 
   useEffect(() => {
-    console.log("ProtectedRoute mounted");
-
-    // ===============================
-    // MODE DEV: AUTH DIMATIKAN
-    // ===============================
-      if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") {
-      console.log("AUTH DISABLED (DEV MODE)");
+    // DEV MODE: Skip auth check if NEXT_PUBLIC_DISABLE_AUTH=true
+    if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") {
+      console.log("[AUTH] Auth disabled (dev mode)");
       setChecking(false);
       return;
     }
-    
-    //===============================
-    //   MODE NORMAL (LOGIN DIPAKAI)
-    //===============================
-    /*
+
     const token = localStorage.getItem("accessToken");
 
     if (!token) {
-      console.log("NO TOKEN → UNAUTHORIZED");
       setUnauthorized(true);
-
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         router.replace("/login");
       }, 2000);
-    } else {
-      console.log("TOKEN FOUND");
-      setChecking(false);
+      return () => clearTimeout(timer);
     }
-    */
-    //=============================== 
 
+    setChecking(false);
   }, [router]);
 
-  // AKSES DITOLAK
   if (unauthorized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -58,9 +43,9 @@ export default function ProtectedRoute({
           <p className="text-sm text-gray-600 mb-4">
             Silakan login terlebih dahulu untuk mengakses halaman ini.
           </p>
-          <div className="text-xs text-gray-400 mb-4">
+          <p className="text-xs text-gray-400 mb-4">
             Mengalihkan ke halaman login...
-          </div>
+          </p>
           <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent mx-auto" />
         </div>
       </div>
