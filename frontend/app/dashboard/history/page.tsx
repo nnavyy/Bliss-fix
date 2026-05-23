@@ -16,10 +16,35 @@ function generateReportId() {
   return `RPT-${date}-${rand}`;
 }
 
-// Translate stored result value to display label
 function resultLabel(result: string) {
   return result === "Batu Ginjal" ? "Kidney Stone" : result;
 }
+
+const RefreshIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  </svg>
+);
+const SearchIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+);
+const ErrorIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+);
+const DocumentIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+  </svg>
+);
+const CloseIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<ScanHistoryItem[]>([]);
@@ -175,42 +200,42 @@ export default function HistoryPage() {
   const totalNormal = history.filter((h) => h.result === "Normal").length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50">
       <main className="max-w-6xl mx-auto px-6 py-10 space-y-6">
         {/* PAGE HEADER */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Scan History</h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Scan History</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">
               {loading
                 ? "Loading..."
-                : `${history.length} scans total · ${totalStone} kidney stone · ${totalNormal} normal`}
+                : `${history.length} scans total | ${totalStone} kidney stone | ${totalNormal} normal`}
             </p>
           </div>
           <button
             onClick={loadHistory}
             disabled={loading}
-            className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 disabled:opacity-50 font-medium transition mt-1"
+            className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-1.5 rounded-lg disabled:opacity-50 font-medium transition duration-200 mt-1"
           >
-            <span className={loading ? "animate-spin inline-block" : ""}>
-              ↻
+            <span className={loading ? "animate-spin" : ""}>
+              <RefreshIcon />
             </span>
             Refresh
           </button>
         </div>
 
         {/* SEARCH + FILTER BAR */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">
-              🔍
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <SearchIcon />
             </span>
             <input
               type="text"
               placeholder="Search patient name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+              className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none bg-white shadow-sm"
             />
           </div>
           <select
@@ -218,7 +243,7 @@ export default function HistoryPage() {
             onChange={(e) =>
               setFilterResult(e.target.value as typeof filterResult)
             }
-            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[140px]"
+            className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none min-w-[150px] shadow-sm"
           >
             <option value="all">All Results</option>
             <option value="Batu Ginjal">Kidney Stone</option>
@@ -228,41 +253,41 @@ export default function HistoryPage() {
 
         {/* ERROR */}
         {error && (
-          <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
-            <span>⚠️</span>
-            <span>{error}</span>
+          <div className="flex items-center gap-3 bg-red-50/50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+            <ErrorIcon />
+            <span className="font-medium">{error}</span>
           </div>
         )}
 
         {/* LOADING */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-3">
-            <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent" />
-            <p className="text-sm text-gray-400">Loading scan history...</p>
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <div className="animate-spin rounded-full h-10 w-10 border-[3px] border-blue-600 border-t-transparent" />
+            <p className="text-sm font-medium text-gray-400">Loading scan history...</p>
           </div>
         )}
 
         {/* EMPTY STATE */}
         {!loading && filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="text-6xl mb-4">
-              {history.length === 0 ? "📋" : "🔍"}
+          <div className="flex flex-col items-center justify-center py-24 text-center bg-white border border-dashed border-gray-200 rounded-2xl shadow-sm">
+            <div className="text-gray-300 mb-4">
+              {history.length === 0 ? <DocumentIcon className="w-16 h-16" /> : <SearchIcon className="w-16 h-16" />}
             </div>
             {history.length === 0 ? (
               <>
-                <h3 className="text-lg font-semibold text-gray-700">
+                <h3 className="text-lg font-bold text-gray-900">
                   No scan history yet
                 </h3>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-gray-500 mt-1 font-medium">
                   Upload a CT scan to start building your history.
                 </p>
               </>
             ) : (
               <>
-                <h3 className="text-lg font-semibold text-gray-700">
+                <h3 className="text-lg font-bold text-gray-900">
                   No matching results
                 </h3>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-gray-500 mt-1 font-medium">
                   Try a different search term or filter.
                 </p>
                 <button
@@ -270,7 +295,7 @@ export default function HistoryPage() {
                     setSearch("");
                     setFilterResult("all");
                   }}
-                  className="mt-4 text-sm text-blue-600 hover:underline font-medium"
+                  className="mt-5 px-4 py-2 bg-blue-50 text-sm text-blue-600 rounded-lg hover:bg-blue-100 font-semibold transition"
                 >
                   Clear filters
                 </button>
@@ -281,71 +306,72 @@ export default function HistoryPage() {
 
         {/* SCAN GRID */}
         {!loading && filtered.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md hover:border-blue-200 transition-all relative group"
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-0.5 hover:border-blue-200 transition-all duration-200 relative group flex flex-col"
                 onClick={() => setSelected(item)}
               >
                 {/* DELETE BUTTON */}
                 <button
                   onClick={(e) => handleDelete(item, e)}
                   disabled={deletingId === item.id}
-                  className="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-300 text-xs"
+                  className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-gray-400 hover:text-red-600 hover:border-red-300 text-xs shadow-sm"
                   title="Delete this scan"
                 >
                   {deletingId === item.id ? (
-                    <span className="animate-spin">↻</span>
+                    <span className="animate-spin"><RefreshIcon className="w-3.5 h-3.5" /></span>
                   ) : (
-                    "✕"
+                    <CloseIcon className="w-4 h-4" />
                   )}
                 </button>
 
-                {/* IMAGE — white/light background so CT scans are visible */}
-                <div className="h-40 bg-white flex items-center justify-center overflow-hidden border-b border-gray-100">
+                {/* IMAGE */}
+                <div className="h-44 bg-gray-50 flex items-center justify-center overflow-hidden border-b border-gray-100 p-2">
                   <img
                     src={item.image}
                     alt="CT Scan"
-                    className="h-full w-full object-contain"
+                    className="h-full w-full object-contain rounded-lg"
                   />
                 </div>
 
                 {/* CARD BODY */}
-                <div className="p-4">
-                  {/* Result badge — top row */}
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <p className="font-bold text-gray-900 truncate text-sm">
-                      {item.patientName}
-                    </p>
-                    <span
-                      className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${
-                        item.result === "Batu Ginjal"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {item.result === "Batu Ginjal" ? "⚠️ Stone" : "✅ Normal"}
-                    </span>
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between gap-3 mb-2.5">
+                      <p className="font-bold text-gray-900 truncate text-[15px]">
+                        {item.patientName}
+                      </p>
+                      <span
+                        className={`shrink-0 text-[11px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-md border ${
+                          item.result === "Batu Ginjal"
+                            ? "bg-red-50 border-red-200 text-red-700"
+                            : "bg-green-50 border-green-200 text-green-700"
+                        }`}
+                      >
+                        {item.result === "Batu Ginjal" ? "Stone" : "Normal"}
+                      </span>
+                    </div>
+                    <p className="text-xs font-medium text-gray-500 mb-4">{item.date}</p>
                   </div>
-                  <p className="text-xs text-gray-500 mb-3">{item.date}</p>
 
                   {/* CONFIDENCE BAR */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-500 font-medium">
-                        Confidence
+                  <div className="pt-3 border-t border-gray-50 mt-auto">
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-gray-500 font-medium tracking-wide uppercase text-[10px]">
+                        AI Confidence
                       </span>
-                      <span className="font-bold text-gray-700">
+                      <span className="font-bold text-gray-800">
                         {Math.round(item.confidence * 100)}%
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${
                           item.result === "Batu Ginjal"
-                            ? "bg-red-400"
-                            : "bg-green-400"
+                            ? "bg-red-500"
+                            : "bg-green-500"
                         }`}
                         style={{
                           width: `${Math.round(item.confidence * 100)}%`,
@@ -363,30 +389,30 @@ export default function HistoryPage() {
       {/* DETAIL MODAL */}
       {selected && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
           onClick={(e) => e.target === e.currentTarget && setSelected(null)}
         >
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             {/* MODAL HEADER */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div className="flex items-center justify-between px-7 py-5 border-b border-gray-100 sticky top-0 bg-white/90 backdrop-blur-md z-10">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-gray-900 tracking-tight">
                   {selected.patientName}
                 </h2>
-                <p className="text-xs text-gray-400 mt-0.5">{selected.date}</p>
+                <p className="text-sm font-medium text-gray-500 mt-1">{selected.date}</p>
               </div>
               <button
                 onClick={() => setSelected(null)}
-                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition text-sm"
+                className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition"
               >
-                ✕
+                <CloseIcon />
               </button>
             </div>
 
             {/* MODAL BODY */}
-            <div className="p-6 space-y-5">
+            <div className="p-7 space-y-6">
               {/* CT SCAN IMAGE */}
-              <div className="rounded-xl overflow-hidden border border-gray-200 bg-black">
+              <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-50 shadow-sm">
                 <CTOverlay
                   imageSrc={selected.image}
                   predictions={selected.predictions ?? []}
@@ -396,18 +422,18 @@ export default function HistoryPage() {
 
               {/* RESULT BLOCK */}
               <div
-                className={`flex items-center gap-4 p-4 rounded-xl border ${
+                className={`flex items-center gap-5 p-5 rounded-xl border ${
                   selected.result === "Batu Ginjal"
-                    ? "bg-red-50 border-red-200"
-                    : "bg-green-50 border-green-200"
+                    ? "bg-red-50/50 border-red-200 text-red-900"
+                    : "bg-green-50/50 border-green-200 text-green-900"
                 }`}
               >
-                <span className="text-3xl">
-                  {selected.result === "Batu Ginjal" ? "⚠️" : "✅"}
-                </span>
+                <div className={`p-2.5 rounded-full ${selected.result === "Batu Ginjal" ? "bg-red-100" : "bg-green-100"}`}>
+                  {selected.result === "Batu Ginjal" ? <ErrorIcon className="w-7 h-7 text-red-600" /> : <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                </div>
                 <div>
                   <p
-                    className={`font-bold text-base ${
+                    className={`font-bold text-lg ${
                       selected.result === "Batu Ginjal"
                         ? "text-red-700"
                         : "text-green-700"
@@ -417,13 +443,13 @@ export default function HistoryPage() {
                       ? "Kidney Stone Detected"
                       : "No Kidney Stone Detected"}
                   </p>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <p className="text-sm font-medium opacity-80 mt-1">
                     Confidence:{" "}
                     <strong
                       className={
                         selected.result === "Batu Ginjal"
-                          ? "text-red-600"
-                          : "text-green-600"
+                          ? "text-red-700"
+                          : "text-green-700"
                       }
                     >
                       {Math.round(selected.confidence * 100)}%
@@ -433,35 +459,33 @@ export default function HistoryPage() {
               </div>
 
               {/* DISCLAIMER */}
-              <div className="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                <span className="shrink-0 mt-0.5">⚠️</span>
-                <span>
-                  This result is a decision-support tool and does{" "}
-                  <strong>not</strong> replace diagnosis by a qualified medical
-                  specialist.
-                </span>
+              <div className="flex items-start gap-3 text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-5 py-4">
+                <div className="mt-0.5 text-gray-400">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <p className="leading-relaxed">
+                  <span className="font-semibold text-gray-900">Clinical Disclaimer:</span> This result is a decision-support tool and does{" "}
+                  <strong>not</strong> replace diagnosis by a qualified medical specialist.
+                </p>
               </div>
 
               {/* ACTION BUTTONS */}
-              <div className="flex gap-3 pt-1">
+              <div className="flex gap-4 pt-2">
                 <button
                   onClick={() => handleDownloadPDF(selected)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm shadow-blue-600/20"
                 >
-                  📄 Download PDF Report
+                  <DocumentIcon className="w-5 h-5" /> Download PDF Report
                 </button>
                 <button
                   onClick={(e) => handleDelete(selected, e)}
                   disabled={deletingId === selected.id}
-                  className="px-4 py-2.5 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition text-sm font-medium disabled:opacity-50"
+                  className="px-6 py-3.5 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 transition text-sm font-semibold disabled:opacity-50 flex items-center gap-2"
                 >
                   {deletingId === selected.id ? (
-                    <span className="flex items-center gap-1">
-                      <span className="animate-spin inline-block">↻</span>{" "}
-                      Deleting...
-                    </span>
+                    <><RefreshIcon className="w-4 h-4 animate-spin" /> Deleting...</>
                   ) : (
-                    "Delete"
+                    "Delete Record"
                   )}
                 </button>
               </div>

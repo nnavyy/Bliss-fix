@@ -14,6 +14,7 @@
     "@prisma/client": "5.10.2",
     "@prisma/extension-accelerate": "^3.0.1",
     "axios": "^1.13.2",
+    "bcryptjs": "^3.0.3",
     "cornerstone-core": "^2.6.1",
     "cornerstone-wado-image-loader": "^4.13.2",
     "dicom-parser": "^1.8.21",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",

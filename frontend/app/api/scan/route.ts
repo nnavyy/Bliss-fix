@@ -1,29 +1,45 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { verifyAuth } from "@/lib/auth-utils";
+import { writeFileSync, mkdirSync, existsSync } from "fs";
+import { join } from "path";
 
 export async function POST(req: Request) {
   try {
-    const formData = await req.formData();
+    const authHeader = req.headers.get("Authorization");
+    const payload = verifyAuth(authHeader);
 
+    if (!payload || !payload.doctorId) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized request" },
+        { status: 401 },
+      );
+    }
+    const doctorId = payload.doctorId;
+
+    const formData = await req.formData();
     const image = formData.get("image") as File | null;
     const patientName = formData.get("patientName") as string | null;
 
     if (!image || !patientName) {
       return NextResponse.json(
-        { success: false, message: "Gambar dan nama pasien wajib diisi" },
+        { success: false, message: "Image and patient name are required" },
         { status: 400 },
       );
     }
 
-    // Extract doctorId from JWT (optional - scan still works without auth)
-    const authHeader = req.headers.get("Authorization");
-    const payload = verifyAuth(authHeader);
-    const doctorId = payload?.doctorId ?? null;
-
     const buffer = Buffer.from(await image.arrayBuffer());
     const base64Image = buffer.toString("base64");
-    const imageDataUrl = `data:image/png;base64,${base64Image}`;
+    
+    // Save image to public directory
+    const publicUploadDir = join(process.cwd(), "public", "uploads");
+    if (!existsSync(publicUploadDir)) {
+        mkdirSync(publicUploadDir, { recursive: true });
+    }
+    const filename = `${Date.now()}-${image.name.replace(/\s+/g, "_")}`;
+    const filePath = join(publicUploadDir, filename);
+    writeFileSync(filePath, buffer);
+    const imageUrl = `/uploads/${filename}`;
 
     const roboflowModel = process.env.ROBOFLOW_MODEL;
     const roboflowVersion = process.env.ROBOFLOW_VERSION;
@@ -32,7 +48,7 @@ export async function POST(req: Request) {
     if (!roboflowModel || !roboflowVersion || !roboflowApiKey) {
       console.error("[SCAN] Roboflow env vars missing");
       return NextResponse.json(
-        { success: false, message: "Konfigurasi AI service tidak lengkap" },
+        { success: false, message: "Server configuration missing" },
         { status: 500 },
       );
     }
@@ -49,7 +65,7 @@ export async function POST(req: Request) {
       const errText = await rfRes.text();
       console.error("[SCAN] Roboflow error:", errText);
       return NextResponse.json(
-        { success: false, message: "Gagal menghubungi layanan AI. Coba lagi." },
+        { success: false, message: "Failed to communicate with AI service" },
         { status: 502 },
       );
     }
@@ -69,24 +85,20 @@ export async function POST(req: Request) {
 
     const resultLabel = hasStone ? "Batu Ginjal" : "Normal";
 
-    // Save to DB only if authenticated
-    let savedScan = null;
-    if (doctorId) {
-      try {
-        savedScan = await prisma.scan.create({
-          data: {
-            patientName,
-            image: imageDataUrl,
-            result: resultLabel,
-            confidence: maxConfidence,
-            predictions: predictions,
-            doctorId,
-          },
-        });
-      } catch (dbErr) {
-        // Don't fail the scan request if DB save fails
-        console.error("[SCAN] DB save failed:", dbErr);
-      }
+    let savedScan;
+    try {
+      savedScan = await prisma.scan.create({
+        data: {
+          patientName,
+          image: imageUrl,
+          result: resultLabel,
+          confidence: maxConfidence,
+          predictions: predictions,
+          doctorId,
+        },
+      });
+    } catch (dbErr) {
+      console.error("[SCAN] DB save failed:", dbErr);
     }
 
     return NextResponse.json({

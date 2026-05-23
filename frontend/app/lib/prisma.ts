@@ -22,9 +22,7 @@ function createPrismaClient() {
     );
   }
 
-  return new PrismaClient({
-    datasourceUrl: url,
-  }).$extends(withAccelerate());
+  return new PrismaClient().$extends(withAccelerate());
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

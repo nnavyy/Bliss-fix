@@ -18,7 +18,7 @@ export default function LoginPage() {
     setError("");
 
     if (!doctorId.trim() || !token.trim()) {
-      setError("Doctor ID and Token are required.");
+      setError("Doctor ID and Password are required.");
       return;
     }
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
 
       if (!res.success) {
         setError(
-          res.message || "Invalid Doctor ID or Token. Please try again.",
+          res.message || "Invalid Doctor ID or Password. Please try again.",
         );
         return;
       }
@@ -43,51 +43,47 @@ export default function LoginPage() {
     }
   };
 
-  const fillPrototype = () => {
-    setDoctorId("user1");
-    setToken("user1");
-    setError("");
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
         {/* LOGO + TITLE */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-3">
-            <Image
-              src="/medikidney2.png"
-              alt="MediKidney Logo"
-              width={56}
-              height={56}
-              priority
-              onError={() => {}}
-            />
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-2">
+              <Image
+                src="/medikidney2.png"
+                alt="MediKidney Logo"
+                width={48}
+                height={48}
+                priority
+                onError={() => {}}
+                className="object-contain"
+              />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-blue-600">MediKidney</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            AI-Powered Kidney Stone Detection
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">MediKidney</h1>
+          <p className="text-sm text-gray-500 mt-2 font-medium">
+            Clinical Decision Support System
           </p>
         </div>
 
         {/* CARD */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-6 text-center">
-            Doctor Sign In
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
+            Professional Access
           </h2>
 
           {/* ERROR */}
           {error && (
-            <div className="mb-5 flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-              <span className="mt-0.5 shrink-0">⚠️</span>
-              <span>{error}</span>
+            <div className="mb-6 flex items-start gap-3 text-sm text-red-700 bg-red-50/50 border border-red-200 rounded-xl px-4 py-3">
+              <span className="font-medium">{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-5">
             {/* DOCTOR ID */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Doctor ID
               </label>
               <input
@@ -97,15 +93,15 @@ export default function LoginPage() {
                 disabled={loading}
                 autoComplete="username"
                 autoFocus
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 transition"
-                placeholder="Enter your Doctor ID"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:bg-gray-50 transition duration-200"
+                placeholder="Enter your registered ID"
               />
             </div>
 
             {/* TOKEN */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Token / Password
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Password
               </label>
               <input
                 type="password"
@@ -113,8 +109,8 @@ export default function LoginPage() {
                 onChange={(e) => setToken(e.target.value)}
                 disabled={loading}
                 autoComplete="current-password"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 transition"
-                placeholder="Enter your Token"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:bg-gray-50 transition duration-200"
+                placeholder="Enter your password"
               />
             </div>
 
@@ -122,40 +118,27 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !doctorId.trim() || !token.trim()}
-              className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition font-medium text-sm disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+              className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 active:bg-blue-800 transition duration-200 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm shadow-blue-600/20"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                  Signing in...
+                  <span className="animate-spin inline-block w-4 h-4 border-2 border-white/80 border-t-transparent rounded-full" />
+                  Authenticating...
                 </span>
               ) : (
-                "Sign In"
+                "Sign In to Dashboard"
               )}
             </button>
           </form>
-
-          {/* DEV HINT — prototype only */}
-          {process.env.NEXT_PUBLIC_DISABLE_AUTH !== "false" && (
-            <div className="mt-6 pt-5 border-t border-gray-100">
-              <p className="text-xs text-gray-400 text-center mb-2">
-                Prototype Mode — Demo credentials:
-              </p>
-              <button
-                type="button"
-                onClick={fillPrototype}
-                className="w-full text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg py-2 transition font-medium"
-              >
-                Use demo account: <b>user1</b> / <b>user1</b>
-              </button>
-            </div>
-          )}
         </div>
 
         {/* DISCLAIMER */}
-        <p className="text-center text-xs text-gray-400 mt-5">
-          This system is for authorized medical use only.
-        </p>
+        <div className="mt-8 text-center">
+          <p className="text-xs text-gray-400 font-medium">
+            Authorized medical personnel only.
+            <br /> All access is logged and monitored.
+          </p>
+        </div>
       </div>
     </div>
   );

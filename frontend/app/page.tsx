@@ -10,29 +10,31 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.replace("/login");
-    }, 1200);
+    }, 1500);
     return () => clearTimeout(timer);
   }, [router]);
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100">
-      <div className="text-center">
-        <div className="flex justify-center mb-4">
-          <Image
-            src="/medikidney2.png"
-            alt="MediKidney"
-            width={64}
-            height={64}
-            priority
-            onError={() => {}}
-          />
+    <div className="flex h-screen w-full items-center justify-center bg-gray-50">
+      <div className="text-center animate-in fade-in zoom-in duration-700">
+        <div className="flex justify-center mb-6">
+          <div className="w-20 h-20 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-2">
+            <Image
+              src="/medikidney2.png"
+              alt="MediKidney"
+              width={56}
+              height={56}
+              priority
+              onError={() => {}}
+            />
+          </div>
         </div>
-        <h1 className="text-2xl font-bold text-blue-600">MediKidney</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          Kidney Stone Detection System
+        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">MediKidney</h1>
+        <p className="text-gray-500 text-sm mt-2 font-medium">
+          Clinical Decision Support System
         </p>
-        <div className="mt-6 flex justify-center">
-          <div className="h-6 w-6 animate-spin rounded-full border-[3px] border-blue-500 border-t-transparent" />
+        <div className="mt-8 flex justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-[3px] border-gray-200 border-t-blue-600" />
         </div>
       </div>
     </div>

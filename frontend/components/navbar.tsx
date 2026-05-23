@@ -27,34 +27,35 @@ export default function DashboardNavbar() {
   ];
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         {/* LOGO */}
-        <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
-          <Image
-            src="/medikidney2.png"
-            alt="MediKidney"
-            width={36}
-            height={36}
-            priority
-            onError={() => {}}
-          />
-          <span className="font-bold text-lg text-blue-600 hidden sm:block">
+        <Link href="/dashboard" className="flex items-center gap-3 shrink-0">
+          <div className="w-9 h-9 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center p-1">
+            <Image
+              src="/medikidney2.png"
+              alt="MediKidney"
+              width={28}
+              height={28}
+              priority
+              onError={() => {}}
+            />
+          </div>
+          <span className="font-bold text-lg text-blue-700 hidden sm:block tracking-tight">
             MediKidney
           </span>
         </Link>
 
         {/* GREETING — center */}
-        <div className="hidden md:block text-sm text-gray-500 text-center">
-          Welcome,{" "}
-          <span className="font-semibold text-blue-600">
+        <div className="hidden md:block text-sm text-gray-500 text-center font-medium">
+          Logged in as{" "}
+          <span className="font-semibold text-gray-900">
             Dr. {doctorId ?? "—"}
-          </span>{" "}
-          👋
+          </span>
         </div>
 
         {/* NAV + LOGOUT */}
-        <nav className="flex items-center gap-1 shrink-0">
+        <nav className="flex items-center gap-2 shrink-0">
           {menu.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href);
@@ -62,9 +63,9 @@ export default function DashboardNavbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition duration-200 ${
                   isActive
-                    ? "bg-blue-50 text-blue-600"
+                    ? "bg-blue-50 text-blue-700 shadow-sm shadow-blue-100"
                     : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
                 }`}
               >
@@ -73,9 +74,11 @@ export default function DashboardNavbar() {
             );
           })}
 
+          <div className="h-6 w-[1px] bg-gray-200 mx-2 hidden sm:block"></div>
+
           <button
             onClick={handleLogout}
-            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition duration-200"
           >
             Sign Out
           </button>

@@ -4,14 +4,14 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")   // prisma:// URL — untuk Prisma Client (Accelerate)
-  directUrl = env("DIRECT_URL")     // postgresql:// URL — untuk migrations & prisma db push
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Doctor {
-  doctorId  String   @id
-  token     String
-  createdAt DateTime @default(now())
+  doctorId     String   @id
+  passwordHash String
+  createdAt    DateTime @default(now())
 
   scans Scan[]
 }
@@ -19,7 +19,7 @@ model Doctor {
 model Scan {
   id          String   @id @default(uuid())
   patientName String
-  image       String   // base64 data URL
+  image       String   // Local path or URL
   result      String   // "Batu Ginjal" | "Normal"
   confidence  Float
   predictions Json     // raw predictions dari Roboflow
