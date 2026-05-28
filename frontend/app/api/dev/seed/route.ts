@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import bcrypt from "bcryptjs";
 
 // ================================================================
 // DEV-ONLY ENDPOINT — Tidak bisa diakses di production
@@ -40,10 +41,11 @@ export async function GET() {
         continue;
       }
 
+      const passwordHash = await bcrypt.hash(user.token, 10);
       await prisma.doctor.create({
         data: {
           doctorId: user.doctorId,
-          token: user.token,
+          passwordHash,
         },
       });
 
