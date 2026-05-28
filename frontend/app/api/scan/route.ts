@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { verifyAuth } from "@/lib/auth-utils";
-import { writeFileSync, mkdirSync, existsSync } from "fs";
-import { join } from "path";
 
 export async function POST(req: Request) {
   try {
@@ -30,16 +28,10 @@ export async function POST(req: Request) {
 
     const buffer = Buffer.from(await image.arrayBuffer());
     const base64Image = buffer.toString("base64");
-    
-    // Save image to public directory
-    const publicUploadDir = join(process.cwd(), "public", "uploads");
-    if (!existsSync(publicUploadDir)) {
-        mkdirSync(publicUploadDir, { recursive: true });
-    }
-    const filename = `${Date.now()}-${image.name.replace(/\s+/g, "_")}`;
-    const filePath = join(publicUploadDir, filename);
-    writeFileSync(filePath, buffer);
-    const imageUrl = `/uploads/${filename}`;
+
+    // Store image as base64 data URL (Vercel has read-only filesystem)
+    const mimeType = image.type || "image/jpeg";
+    const imageUrl = `data:${mimeType};base64,${base64Image}`;
 
     const roboflowModel = process.env.ROBOFLOW_MODEL;
     const roboflowVersion = process.env.ROBOFLOW_VERSION;
